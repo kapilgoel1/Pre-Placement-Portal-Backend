@@ -9,12 +9,11 @@ const router = new express.Router();
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) throw err;
-    if (!user) res.send('No User Exists');
+    if (!user) res.json('No User Exists');
     else {
       req.logIn(user, (err) => {
         if (err) throw err;
-        res.send('Successfully Authenticated');
-        console.log(req.user);
+        res.json('Successfully Authenticated');
       });
     }
   })(req, res, next);
@@ -39,24 +38,24 @@ router.post('/register', (req, res, next) => {
         if (err) {
           return next(err);
         }
-        res.status(200).send('successful');
+        res.status(200).json('successful');
       });
     }
   });
 });
 
-router.get('/userdetails', isAuthenticated, (req, res) => {
+router.get('/details', isAuthenticated, (req, res) => {
   res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
 });
 
-router.get('/logout', (req, res) => {
+router.get('/logout', isAuthenticated, (req, res) => {
   req.logout();
-  res.send('logged out');
+  res.json('logged out');
 });
 
 router.post('/updateprofile', isAuthenticated, async (req, res) => {
   if (req.body.email || req.body.role || req.body.admin || req.body._id) {
-    res.status(500).send('Invalid Operation!');
+    res.status(500).json('Invalid Operation!');
   }
   if (req.body.password) {
     req.body.password = await bcrypt.hash(req.body.password, 10);
@@ -67,7 +66,7 @@ router.post('/updateprofile', isAuthenticated, async (req, res) => {
   } catch (err) {
     res.status(404).send(err);
   }
-  res.status(200).send('Data updated');
+  res.status(200).json('Data updated');
 });
 
 module.exports = router;

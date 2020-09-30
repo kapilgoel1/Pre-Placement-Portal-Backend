@@ -1,13 +1,13 @@
 const express = require('express');
 const multer = require('multer');
-// const s3 = require('../cloudstorage/aws');
+const s3 = require('../cloudstorage/aws');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const FileInfo = require('../models/fileinfo');
 const { isAuthenticated, isFaculty } = require('../middleware/checkauthlevel');
 const router = new express.Router();
 
-router.get('/fileinfo', isAuthenticated, async (req, res) => {
+router.get('/retrievelist', isAuthenticated, async (req, res) => {
   try {
     const filelist = await FileInfo.find({
       ...req.query,
@@ -30,7 +30,7 @@ router.get('/fileinfo', isAuthenticated, async (req, res) => {
 var storage = multer.memoryStorage();
 var upload = multer({ storage: storage });
 
-router.post('/file', isAuthenticated, upload.single('multerkey'), function (
+router.post('/add', isAuthenticated, upload.single('multerkey'), function (
   req,
   res,
   next
@@ -49,15 +49,15 @@ router.post('/file', isAuthenticated, upload.single('multerkey'), function (
       throw err;
     }
     const file = new FileInfo({
+      ...req.query,
       uuid: uniqueid,
       filename: req.file.originalname,
       extension: extension,
-      ...req.query,
       owner: req.user._id,
     });
     try {
       await file.save();
-      res.status(201).send('uploaded successfully');
+      res.status(201).json('uploaded successfully');
     } catch (e) {
       res.status(400).send(e);
     }
@@ -72,10 +72,10 @@ router.get('/getdownloadtoken/:fileid', isAuthenticated, (req, res) => {
       expiresIn: 200,
     }
   );
-  res.send({ downloadtoken });
+  res.json(downloadtoken);
 });
 
-router.get('/downloadfile/:token', isAuthenticated, async (req, res) => {
+router.get('/download/:token', isAuthenticated, async (req, res) => {
   try {
     var { fileid } = jwt.verify(
       req.params.token,
@@ -102,7 +102,7 @@ router.get('/downloadfile/:token', isAuthenticated, async (req, res) => {
   });
 });
 
-router.delete('/file/:fileid', isAuthenticated, async (req, res) => {
+router.delete('/remove/:fileid', isAuthenticated, async (req, res) => {
   var fileid = req.params.fileid;
   try {
     var result = await FileInfo.deleteOne({ uuid: fileid });
@@ -116,7 +116,7 @@ router.delete('/file/:fileid', isAuthenticated, async (req, res) => {
   if (result.deletedCount === 1) {
     s3.deleteObject(params, function (err, data) {
       if (data) {
-        res.status(200).send('Deletion successful');
+        res.status(200).json('Deletion successful');
       } else {
         res.status(500).send(err);
       }
