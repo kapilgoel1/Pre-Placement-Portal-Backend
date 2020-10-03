@@ -10,6 +10,7 @@ const subjectSchema = new mongoose.Schema({
   },
   programme: {
     type: String,
+    default: 'MCA',
   },
 });
 

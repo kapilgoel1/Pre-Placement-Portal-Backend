@@ -1,6 +1,6 @@
 function isAuthenticated(req, res, next) {
   if (req.isAuthenticated()) return next();
-  res.json('not authenticated');
+  res.status(400).json('not authenticated');
 }
 
 function isFaculty(req, res, next) {

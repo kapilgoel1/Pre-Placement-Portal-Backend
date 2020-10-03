@@ -9,11 +9,11 @@ const router = new express.Router();
 router.post('/login', (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) throw err;
-    if (!user) res.json('No User Exists');
+    if (!user) res.status(400).json('No User Exists');
     else {
       req.logIn(user, (err) => {
         if (err) throw err;
-        res.json('Successfully Authenticated');
+        res.json(user);
       });
     }
   })(req, res, next);
@@ -24,7 +24,7 @@ router.post('/register', (req, res, next) => {
   User.findOne({ email: req.body.email }, async (err, doc) => {
     if (err) throw err;
     if (doc) {
-      console.log('adsa');
+      res.status(400).json('User already exists');
     }
     if (!doc) {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);

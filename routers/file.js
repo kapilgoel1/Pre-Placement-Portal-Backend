@@ -69,7 +69,7 @@ router.get('/getdownloadtoken/:fileid', isAuthenticated, (req, res) => {
     { fileid: req.params.fileid },
     process.env.JWT_DOWNLOAD_SECRET,
     {
-      expiresIn: 200,
+      expiresIn: 2000,
     }
   );
   res.json(downloadtoken);
