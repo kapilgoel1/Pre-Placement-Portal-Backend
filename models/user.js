@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    dob: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,
