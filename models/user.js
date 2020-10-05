@@ -39,6 +39,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    course: {
+      type: String,
+      default: 'MCA',
+    },
     semester: {
       type: String,
       default: '',
@@ -46,6 +50,18 @@ const userSchema = new mongoose.Schema(
     passwordupdated: {
       type: Boolean,
       default: false,
+    },
+    address: {
+      type: String,
+      default: '',
+    },
+    fathersname: {
+      type: String,
+      default: '',
+    },
+    mothersname: {
+      type: String,
+      default: '',
     },
   },
   {
