@@ -23,7 +23,7 @@ app.use(
     secret: 'secretcode',
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 400000 },
+    cookie: { maxAge: 10800000 },
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
   })
 );
