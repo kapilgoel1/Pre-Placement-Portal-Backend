@@ -45,6 +45,7 @@ router.post('/add', isAuthenticated, upload.single('multerkey'), function (
   };
 
   s3.upload(params, async function (err, data) {
+    try {
     if (err) {
       throw err;
     }
@@ -55,7 +56,6 @@ router.post('/add', isAuthenticated, upload.single('multerkey'), function (
       extension: extension,
       owner: req.user._id,
     });
-    try {
       await file.save();
       res.status(201).json('uploaded successfully');
     } catch (e) {

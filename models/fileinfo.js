@@ -18,6 +18,7 @@ const fileInfoSchema = new mongoose.Schema(
     subject: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subject',
+      default: '5f9887f1a71e98361c68da85'
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
