@@ -8,9 +8,20 @@ const { isAuthenticated, isFaculty } = require('../middleware/checkauthlevel');
 const router = new express.Router();
 
 router.get('/retrievelist', isAuthenticated, async (req, res) => {
+
+  const { skip, limit, filename,  ...filterOptions } = req.query
+  
+  let filterArray = [];
+  
+  if(filename) {
+  const re = new RegExp(filename, 'gmi');
+  filterArray.push({filename: re });
+  }
+  filterArray.push(filterOptions);
+
   try {
-    const filelist = await FileInfo.find({
-      ...req.query,
+    const filelist = FileInfo.find({
+      $and: filterArray
     })
       .populate({
         path: 'subject',
@@ -20,8 +31,19 @@ router.get('/retrievelist', isAuthenticated, async (req, res) => {
         path: 'owner',
         select: 'firstname lastname',
       })
-      .sort({ createdAt: 'desc' });
-    res.status(200).send(filelist);
+      .sort({ createdAt: 'desc' })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+      const numOfFiles = FileInfo.find({
+        $and: filterArray
+      }).countDocuments();
+
+      Promise.all([filelist, numOfFiles]).then(response => {
+        res.status(200).send({filelist: response[0], numOfFiles: response[1]});
+      })
+
+    
   } catch (e) {
     res.status(400).send(e);
   }
@@ -64,33 +86,32 @@ router.post('/add', isAuthenticated, upload.single('multerkey'), function (
   });
 });
 
-router.get('/getdownloadtoken/:fileid', isAuthenticated, (req, res) => {
-  var downloadtoken = jwt.sign(
-    { fileid: req.params.fileid },
-    process.env.JWT_DOWNLOAD_SECRET,
-    {
-      expiresIn: 2000,
-    }
-  );
-  res.json(downloadtoken);
-});
+// router.get('/getdownloadtoken/:fileid', isAuthenticated, (req, res) => {
+//   var downloadtoken = jwt.sign(
+//     { fileid: req.params.fileid },
+//     process.env.JWT_DOWNLOAD_SECRET,
+//     {
+//       expiresIn: 2000,
+//     }
+//   );
+//   res.json(downloadtoken);
+// });
 
-router.get('/download/:token', isAuthenticated, async (req, res) => {
-  try {
-    var { fileid } = jwt.verify(
-      req.params.token,
-      process.env.JWT_DOWNLOAD_SECRET
-    );
-    var { filename } = await FileInfo.findOne({ uuid: fileid }).select(
-      'filename'
-    );
+router.get('/download/:fileid', isAuthenticated, async (req, res) => {
+  var fileid = req.params.fileid;
+
+  try{
+  var { filename, uuid } = await FileInfo.findOne({ _id: fileid }).select(
+    'filename uuid'
+  );
   } catch (e) {
-    res.status(400).send(e);
+    console.log(e);
+    // res.status(400).send(e);
   }
 
   const params = {
     Bucket: process.env.BUCKET_NAME,
-    Key: fileid,
+    Key: uuid,
   };
   s3.getObject(params, function (err, data) {
     if (err === null) {
@@ -100,18 +121,45 @@ router.get('/download/:token', isAuthenticated, async (req, res) => {
       res.status(500).send(err);
     }
   });
-});
+})
 
-router.delete('/remove/:fileid', isAuthenticated, async (req, res) => {
-  var fileid = req.params.fileid;
+// router.get('/download/:token', isAuthenticated, async (req, res) => {
+//   try {
+//     var { fileid } = jwt.verify(
+//       req.params.token,
+//       process.env.JWT_DOWNLOAD_SECRET
+//     );
+//     var { filename } = await FileInfo.findOne({ uuid: fileid }).select(
+//       'filename'
+//     );
+//   } catch (e) {
+//     res.status(400).send(e);
+//   }
+
+//   const params = {
+//     Bucket: process.env.BUCKET_NAME,
+//     Key: fileid,
+//   };
+//   s3.getObject(params, function (err, data) {
+//     if (err === null) {
+//       res.attachment(filename);
+//       res.send(data.Body);
+//     } else {
+//       res.status(500).send(err);
+//     }
+//   });
+// });
+
+router.delete('/remove/:uuid', isAuthenticated, async (req, res) => {
+  var uuid = req.params.uuid;
   try {
-    var result = await FileInfo.deleteOne({ uuid: fileid });
+    var result = await FileInfo.deleteOne({ uuid: uuid });
   } catch (err) {
     res.status(500).send(err);
   }
   var params = {
     Bucket: process.env.BUCKET_NAME,
-    Key: fileid,
+    Key: uuid,
   };
   if (result.deletedCount === 1) {
     s3.deleteObject(params, function (err, data) {
@@ -125,5 +173,9 @@ router.delete('/remove/:fileid', isAuthenticated, async (req, res) => {
     res.status(500).send();
   }
 });
+
+router.get('/test', isAuthenticated, (req, res) => {
+  res.json('hello');
+})
 
 module.exports = router;
