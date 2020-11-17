@@ -21,6 +21,7 @@ router.post('/login', (req, res, next) => {
 
 router.post('/register', (req, res, next) => {
   let newUser;
+  try {
   User.findOne({ email: req.body.email }, async (err, doc) => {
     if (err) throw err;
     if (doc) {
@@ -42,6 +43,7 @@ router.post('/register', (req, res, next) => {
       });
     }
   });
+} catch (e) {console.log(e);res.status(400).json('Unsuccessful') }
 });
 
 router.get('/details', isAuthenticated, (req, res) => {

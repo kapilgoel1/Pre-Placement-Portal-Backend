@@ -1,6 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const s3 = require('../cloudstorage/aws');
+var multerS3 = require('multer-s3')
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const FileInfo = require('../models/fileinfo');
@@ -49,53 +50,80 @@ router.get('/retrievelist', isAuthenticated, async (req, res) => {
   }
 });
 
-var storage = multer.memoryStorage();
-var upload = multer({ storage: storage });
 
-router.post('/add', isAuthenticated, upload.single('multerkey'), function (
+router.get('/filedetails/:fileid', isAuthenticated, async (req, res) => {
+  var fileid = req.params.fileid;
+  try {
+  const file = await FileInfo.findById(fileid).populate({
+    path: 'subject',
+    select: 'title',
+  })
+  .populate({
+    path: 'owner',
+    select: 'firstname lastname',
+  })
+  if(file !== null)
+  res.status(200).json(file);
+  else
+  res.status(400).json('Not Found');
+} catch (e) {
+  res.status(400).json('Not Found');
+}  
+})
+
+
+
+
+var upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.BUCKET_NAME,
+    metadata: function (req, file, cb) {
+      cb(null, {fieldName: file.fieldname});
+    },
+    key: function (req, file, cb) {
+      file.uniqueid = uuidv4()
+      cb(null, file.uniqueid)
+    }
+  })
+})
+
+router.post('/add', isAuthenticated, upload.array('multerkey', 10), async function (
   req,
-  res,
-  next
+  res
 ) {
-  const uniqueid = uuidv4();
-  const extension = req.file.originalname.split('.').pop();
-
-  const params = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: uniqueid,
-    Body: req.file.buffer,
-  };
-
-  s3.upload(params, async function (err, data) {
-    try {
-    if (err) {
-      throw err;
-    }
-    const file = new FileInfo({
+  let filesArr  = req.files.map((file) => {
+    return {
       ...req.query,
-      uuid: uniqueid,
-      filename: req.file.originalname,
-      extension: extension,
+      uuid: file.uniqueid,
+      filename: file.originalname,
+      extension: file.originalname.split('.').pop(),
+      size: file.size,
       owner: req.user._id,
-    });
-      await file.save();
-      res.status(201).json('uploaded successfully');
-    } catch (e) {
-      res.status(400).send(e);
     }
-  });
-});
+  })
 
-// router.get('/getdownloadtoken/:fileid', isAuthenticated, (req, res) => {
-//   var downloadtoken = jwt.sign(
-//     { fileid: req.params.fileid },
-//     process.env.JWT_DOWNLOAD_SECRET,
-//     {
-//       expiresIn: 2000,
-//     }
-//   );
-//   res.json(downloadtoken);
-// });
+  try {
+    await FileInfo.insertMany(filesArr).populate({
+      path: 'subject',
+      select: 'title',
+    })
+    .populate({
+      path: 'owner',
+      select: 'firstname lastname',
+    });
+    res.status(201).json('uploaded successfully');
+  }
+  catch (e) {
+        res.status(400).send(e);
+  }
+
+  });
+
+
+
+
+
 
 router.get('/download/:fileid', isAuthenticated, async (req, res) => {
   var fileid = req.params.fileid;
@@ -123,32 +151,7 @@ router.get('/download/:fileid', isAuthenticated, async (req, res) => {
   });
 })
 
-// router.get('/download/:token', isAuthenticated, async (req, res) => {
-//   try {
-//     var { fileid } = jwt.verify(
-//       req.params.token,
-//       process.env.JWT_DOWNLOAD_SECRET
-//     );
-//     var { filename } = await FileInfo.findOne({ uuid: fileid }).select(
-//       'filename'
-//     );
-//   } catch (e) {
-//     res.status(400).send(e);
-//   }
 
-//   const params = {
-//     Bucket: process.env.BUCKET_NAME,
-//     Key: fileid,
-//   };
-//   s3.getObject(params, function (err, data) {
-//     if (err === null) {
-//       res.attachment(filename);
-//       res.send(data.Body);
-//     } else {
-//       res.status(500).send(err);
-//     }
-//   });
-// });
 
 router.delete('/remove/:uuid', isAuthenticated, async (req, res) => {
   var uuid = req.params.uuid;

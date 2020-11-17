@@ -12,22 +12,67 @@ router.post('/add', isAuthenticated, async (req, res) => {
     await announcement.save();
     res.status(201).json('Data uploaded');
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send();
   }
 });
 
 router.get('/retrieve', isAuthenticated, async (req, res) => {
   try {
-    var result = await Announcement.find({ ...req.query })
+    const { skip, limit, ...filterOptions } = req.query
+    var announcementList = Announcement.find({ ...filterOptions })
       .populate({
         path: 'publisher',
         select: 'firstname lastname',
       })
-      .sort({ createdAt: 'desc' });
-    res.status(200).send(result);
+      .sort({ createdAt: 'desc' })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    const numOfAnnouncements = Announcement.find({
+      ...filterOptions
+    }).countDocuments();  
+    
+    Promise.all([announcementList, numOfAnnouncements]).then(response => {
+      res.status(200).send({announcementList: response[0], numOfAnnouncements: response[1]});
+    })
+
   } catch (err) {
-    res.status(500).send(err);
+    console.log(err)
+    res.status(500).send();
   }
 });
+
+router.get('/details/:id', isAuthenticated, async (req, res) => {
+  try {
+  const id = req.params.id;
+  const announcement = await Announcement.findById(id)
+    .populate({
+      path: 'publisher',
+      select: 'firstname lastname',
+    })
+  if(announcement !== null)  
+  res.status(200).json(announcement);
+  else
+  res.status(400).json('Not found')
+} catch (e) {
+  res.status(400).json('Not Found');
+}  
+})
+
+router.delete('/remove/:announcementid', isAuthenticated, async (req, res) => {
+  try {
+    const announcementid = req.params.announcementid;
+    const result = await Announcement.deleteOne({ _id: announcementid });
+    
+    if (result.deletedCount === 1) {      
+      res.status(200).json('Deletion successful');
+    } else {
+      res.status(500).json('No such file exists');
+    }
+  } catch (err) {
+    console.log(err)
+    res.status(500).send();
+  }
+  });
 
 module.exports = router;
