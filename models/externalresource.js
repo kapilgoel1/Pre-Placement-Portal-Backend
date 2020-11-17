@@ -24,6 +24,6 @@ const externalResourceSchema = new mongoose.Schema(
   }
 );
 
-const externalResource = mongoose.model('ExternalResource', externalResourceSchema);
+const externalResource = mongoose.model('External Resource', externalResourceSchema);
 
 module.exports = externalResource ;

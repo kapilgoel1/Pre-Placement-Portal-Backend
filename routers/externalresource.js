@@ -45,7 +45,7 @@ router.get('/retrieve', isAuthenticated, async (req, res) => {
   router.delete('/remove/:id', isAuthenticated, async (req, res) => {
     try {
       const id = req.params.id;
-      const result = await Test.deleteOne({ _id: id });
+      const result = await ExternalResource.deleteOne({ _id: id });
       
       if (result.deletedCount === 1) {      
         res.status(200).json('Deletion successful');
@@ -53,6 +53,7 @@ router.get('/retrieve', isAuthenticated, async (req, res) => {
         res.status(500).send();
       }
     } catch (err) {
+      console.log(err)
       res.status(500).send();
     }
     });
