@@ -5,9 +5,11 @@ const testSchema = new mongoose.Schema(
     title: {
       type: String,
     },
+    detail: {
+      type: String
+    },
     link: {
       type: String,
-      required: true,
     },
     publisher: {
       type: mongoose.Schema.Types.ObjectId,
