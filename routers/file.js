@@ -104,17 +104,11 @@ router.post('/add', isAuthenticated, upload.array('multerkey', 10), async functi
   })
 
   try {
-    await FileInfo.insertMany(filesArr).populate({
-      path: 'subject',
-      select: 'title',
-    })
-    .populate({
-      path: 'owner',
-      select: 'firstname lastname',
-    });
+    await FileInfo.insertMany(filesArr)
     res.status(201).json('uploaded successfully');
   }
   catch (e) {
+      console.log(e)
         res.status(400).send(e);
   }
 
