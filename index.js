@@ -11,6 +11,7 @@ const fileRouter = require('./routers/file');
 const testRouter = require('./routers/test');
 const externalResourceRouter = require('./routers/externalresource');
 const jobPostingRouter = require('./routers/jobposting')
+const manageUsersRouter = require('./routers/manageusers')
 
 const app = express();
 const port = process.env.PORT;
@@ -41,6 +42,7 @@ app.use('/file', fileRouter);
 app.use('/test', testRouter);
 app.use('/externalresource', externalResourceRouter);
 app.use('/jobposting', jobPostingRouter)
+app.use('/manageusers', manageUsersRouter)
 
 app.listen(port, () => {
   console.log('Server is up on port ' + port);
