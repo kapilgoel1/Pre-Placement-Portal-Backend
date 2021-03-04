@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/user');
 const passport = require('passport');
-const { isAuthenticated } = require('../middleware/checkauthlevel');
+const { isAuthenticated, isAdmin } = require('../middleware/checkauthlevel');
 const bcrypt = require('bcryptjs');
 const router = new express.Router();
 
@@ -22,28 +22,56 @@ router.post('/login', (req, res, next) => {
 router.post('/register', (req, res, next) => {
   let newUser;
   try {
-  User.findOne({ email: req.body.email }, async (err, doc) => {
-    if (err) throw err;
-    if (doc) {
-      res.status(400).json('User already exists');
-    }
-    if (!doc) {
-      const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      req.body.password = hashedPassword;
+    User.findOne({ email: req.body.email }, async (err, doc) => {
+      if (err) throw err;
+      if (doc) {
+        res.status(400).json('User already exists');
+      }
+      if (!doc) {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        req.body.password = hashedPassword;
 
-      newUser = new User({
-        ...req.body,
-      });
-      await newUser.save();
-      req.login(newUser, function (err) {
-        if (err) {
-          return next(err);
-        }
+        newUser = new User({
+          ...req.body,
+        });
+        await newUser.save();
+        req.login(newUser, function (err) {
+          if (err) {
+            return next(err);
+          }
+          res.status(200).json('successful');
+        });
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json('Unsuccessful');
+  }
+});
+
+router.post('/registerwithoutlogin', isAuthenticated, isAdmin, (req, res) => {
+  let newUser;
+  try {
+    User.findOne({ email: req.body.email }, async (err, doc) => {
+      if (err) throw err;
+      if (doc) {
+        res.status(400).json('User already exists');
+      }
+      if (!doc) {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        req.body.password = hashedPassword;
+
+        newUser = new User({
+          ...req.body,
+        });
+        await newUser.save();
         res.status(200).json('successful');
-      });
-    }
-  });
-} catch (e) {console.log(e);res.status(400).json('Unsuccessful') }
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({ error: 'Unsuccessful' });
+  }
 });
 
 router.get('/details', isAuthenticated, (req, res) => {

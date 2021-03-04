@@ -1,6 +1,7 @@
 const express = require('express');
 const s3 = require('../cloudstorage/aws');
 const Resume = require('../models/resume');
+const User = require('../models/user');
 const PDFDocument = require('pdfkit');
 const _ = require('lodash');
 const router = new express.Router();
@@ -164,11 +165,12 @@ router.post('/generate', isAuthenticated, async (req, res) => {
     doc.end();
 
     // Uploading files to the bucket
-    s3.upload(params, function (err, data) {
+    s3.upload(params, async function (err, data) {
       if (err) {
         throw err;
       }
       console.log(`File uploaded successfully. ${data.Location}`);
+      await User.updateOne({ _id: req.user._id }, { hasresume: true });
       res.status(200).send({});
     });
   } catch (e) {

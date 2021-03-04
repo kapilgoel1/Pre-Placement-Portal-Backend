@@ -9,8 +9,10 @@ const { isAuthenticated, isFaculty } = require('../middleware/checkauthlevel');
 const router = new express.Router();
 
 router.get('/retrievelist', isAuthenticated, async (req, res) => {
-  const { skip, limit, filename, ...filterOptions } = req.query;
-
+  const { skip, limit, filename, myfiles, ...filterOptions } = req.query;
+  if (myfiles) {
+    filterOptions.owner = req.user._id;
+  }
   let filterArray = [];
 
   if (filename) {

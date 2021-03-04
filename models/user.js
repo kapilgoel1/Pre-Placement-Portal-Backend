@@ -31,10 +31,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'student',
     },
-    admin: {
-      type: Boolean,
-      default: false,
-    },
     phone: {
       type: String,
       default: '',
@@ -66,6 +62,10 @@ const userSchema = new mongoose.Schema(
     dob: {
       type: String,
       default: '',
+    },
+    hasresume: {
+      type: Boolean,
+      default: false,
     },
   },
   {

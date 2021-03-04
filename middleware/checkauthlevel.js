@@ -20,7 +20,7 @@ function isStudent(req, res, next) {
 }
 
 function isAdmin(req, res, next) {
-  if (req.user.admin === true) {
+  if (req.user.role === 'admin') {
     next();
   } else {
     res.send('you are not admin');
