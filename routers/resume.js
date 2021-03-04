@@ -227,4 +227,22 @@ router.get('/my/view', isAuthenticated, async (req, res) => {
   });
 });
 
+router.get('/view/student', isAuthenticated, async (req, res) => {
+  const { userid, name } = req.query;
+
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `resume/${userid}.pdf`,
+  };
+  s3.getObject(params, function (err, data) {
+    if (err === null) {
+      res.setHeader('content-type', 'application/pdf');
+      res.setHeader('Content-disposition', 'inline; filename=' + name + '.pdf');
+      res.send(data.Body);
+    } else {
+      res.status(500).send({ error: 'resume not found' });
+    }
+  });
+});
+
 module.exports = router;
