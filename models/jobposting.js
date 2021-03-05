@@ -4,12 +4,18 @@ const jobPostingSchema = new mongoose.Schema(
   {
     company: {
       type: String,
-      required: true
+      required: true,
     },
-    jobprofile: {
+    description: {
       type: String,
     },
-    package: {
+    salaryrange: {
+      type: String,
+    },
+    role: {
+      type: String,
+    },
+    requirements: {
       type: String,
     },
     publisher: {
