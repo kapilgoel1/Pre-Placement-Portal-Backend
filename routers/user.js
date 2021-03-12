@@ -19,35 +19,35 @@ router.post('/login', (req, res, next) => {
   })(req, res, next);
 });
 
-router.post('/register', (req, res, next) => {
-  let newUser;
-  try {
-    User.findOne({ email: req.body.email }, async (err, doc) => {
-      if (err) throw err;
-      if (doc) {
-        res.status(400).json('User already exists');
-      }
-      if (!doc) {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        req.body.password = hashedPassword;
+// router.post('/register', (req, res, next) => {
+//   let newUser;
+//   try {
+//     User.findOne({ email: req.body.email }, async (err, doc) => {
+//       if (err) throw err;
+//       if (doc) {
+//         res.status(400).json('User already exists');
+//       }
+//       if (!doc) {
+//         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//         req.body.password = hashedPassword;
 
-        newUser = new User({
-          ...req.body,
-        });
-        await newUser.save();
-        req.login(newUser, function (err) {
-          if (err) {
-            return next(err);
-          }
-          res.status(200).json('successful');
-        });
-      }
-    });
-  } catch (e) {
-    console.log(e);
-    res.status(400).json('Unsuccessful');
-  }
-});
+//         newUser = new User({
+//           ...req.body,
+//         });
+//         await newUser.save();
+//         req.login(newUser, function (err) {
+//           if (err) {
+//             return next(err);
+//           }
+//           res.status(200).json('successful');
+//         });
+//       }
+//     });
+//   } catch (e) {
+//     console.log(e);
+//     res.status(400).json('Unsuccessful');
+//   }
+// });
 
 router.post('/registerwithoutlogin', isAuthenticated, isAdmin, (req, res) => {
   let newUser;

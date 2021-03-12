@@ -1,4 +1,7 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const User = require('./models/user');
+const Subject = require('./models/subject');
 const cors = require('cors');
 const passport = require('passport');
 const session = require('express-session');
@@ -35,6 +38,38 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 require('./middleware/passport')(passport);
+
+//initial database setup
+User.findOne({ email: process.env.ADMIN_ID }, async (err, doc) => {
+  if (err) throw err;
+  if (doc) {
+  }
+  if (!doc) {
+    const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+
+    newUser = new User({
+      email: process.env.ADMIN_ID,
+      password: hashedPassword,
+      role: 'admin',
+    });
+    await newUser.save();
+    console.log('admin user created');
+  }
+});
+
+Subject.findOne({ _id: '5f9887f1a71e98361c68da85' }, async (err, doc) => {
+  if (err) throw err;
+  if (doc) {
+  }
+  if (!doc) {
+    newSubject = new Subject({
+      _id: '5f9887f1a71e98361c68da85',
+      title: 'General',
+    });
+    await newSubject.save();
+    console.log('subject created');
+  }
+});
 
 app.use('/user', userRouter);
 app.use('/announcement', announcementRouter);
