@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
         }
       },
     },
+    rollno: {
+      type: String,
+      default: '',
+    },
     password: {
       type: String,
       required: true,
@@ -64,6 +68,10 @@ const userSchema = new mongoose.Schema(
       default: '',
     },
     hasresume: {
+      type: Boolean,
+      default: false,
+    },
+    accountactivated: {
       type: Boolean,
       default: false,
     },

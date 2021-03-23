@@ -1,7 +1,10 @@
 const express = require('express');
+const multer = require('multer');
+const XLSX = require('xlsx');
+const path = require('path');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
-const { isAuthenticated } = require('../middleware/checkauthlevel');
+const { isAuthenticated, isAdmin } = require('../middleware/checkauthlevel');
 const router = new express.Router();
 
 router.get('/retrieve', isAuthenticated, async (req, res) => {
@@ -56,6 +59,87 @@ router.post('/updateprofile/:id', isAuthenticated, async (req, res) => {
     res.status(404).send({ error: 'failure' });
   }
   res.status(200).json('Data updated');
+});
+
+let upload = multer();
+
+router.post(
+  '/bulkregister',
+  isAuthenticated,
+  isAdmin,
+  upload.single('userdata'),
+  async (req, res) => {
+    const ValidateEmail = (mail) => {
+      if (
+        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+          mail
+        )
+      ) {
+        return true;
+      }
+      return false;
+    };
+    try {
+      const workbook = XLSX.read(req.file.buffer);
+      const sheet = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet1']);
+      if (sheet.length === 0) return res.send({ error: 'Empty sheet' });
+      for (let i = 0; i < sheet.length; i++) {
+        // console.log(sheet[i]);
+        if (
+          !(
+            sheet[i].Email_Id &&
+            sheet[i].Password &&
+            (sheet[i].Type_Of_User === 'student' ||
+              sheet[i].Type_Of_User === 'faculty') &&
+            ValidateEmail(sheet[i].Email_Id)
+          )
+        )
+          return res.send({ error: `Incorrect format at row ${i + 1}` });
+      }
+
+      sheet.map(async (user) => {
+        let pass;
+        let obj = {};
+        if (user.First_Name) obj.firstname = user.First_Name;
+        if (user.Last_Name) obj.lastname = user.Last_Name;
+        try {
+          pass = await bcrypt.hash(user.Password.toString(), 10);
+          User.findOneAndUpdate(
+            { email: user.Email_Id },
+            {
+              email: user.Email_Id,
+              password: pass,
+              role: user.Type_Of_User,
+              ...obj,
+            },
+            { upsert: true },
+            () => {}
+          );
+        } catch (e) {
+          console.log(e);
+        }
+      });
+      res.send({ message: 'success' });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+);
+
+router.get('/sampleusersfile', function (req, res) {
+  // var options = {
+  //   root: path.join(__dirname),
+  // };
+
+  // var fileName = 'users.xlsx';
+  // res.sendFile(fileName, options, function (err) {
+  //   if (err) {
+  //     next(err);
+  //   } else {
+  //     console.log('Sent:', fileName);
+  //   }
+  // });
+  res.download(path.join(__dirname, 'users.xlsx'), 'users.xlsx');
 });
 
 module.exports = router;

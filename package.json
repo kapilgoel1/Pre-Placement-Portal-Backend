@@ -27,7 +27,8 @@
     "passport-local": "^1.0.0",
     "pdfkit": "^0.11.0",
     "uuid": "^8.3.0",
-    "validator": "^13.1.17"
+    "validator": "^13.1.17",
+    "xlsx": "^0.16.9"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",

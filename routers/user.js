@@ -74,6 +74,31 @@ router.post('/registerwithoutlogin', isAuthenticated, isAdmin, (req, res) => {
   }
 });
 
+router.post('/signup', isAuthenticated, isAdmin, (req, res) => {
+  let newUser;
+  try {
+    User.findOne({ email: req.body.email }, async (err, doc) => {
+      if (err) throw err;
+      if (doc) {
+        res.status(400).json('User already exists');
+      }
+      if (!doc) {
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        req.body.password = hashedPassword;
+
+        newUser = new User({
+          ...req.body,
+        });
+        await newUser.save();
+        res.status(200).json('successful');
+      }
+    });
+  } catch (e) {
+    console.log(e);
+    res.status(400).json({ error: 'Unsuccessful' });
+  }
+});
+
 router.get('/details', isAuthenticated, (req, res) => {
   res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
 });
