@@ -32,6 +32,7 @@ router.post(
     const announcement = new Announcement({
       title: req.query.title,
       content: req.query.content,
+      course: req.query.course,
       publisher: req.user._id,
       filename: filename,
     });

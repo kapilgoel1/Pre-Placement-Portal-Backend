@@ -18,6 +18,11 @@ const announcementSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: true,
+    },
   },
   {
     timestamps: true,

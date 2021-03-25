@@ -16,7 +16,12 @@ const externalResourceSchema = new mongoose.Schema(
     subject: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subject',
-      default: '5f9887f1a71e98361c68da85'
+      default: '5f9887f1a71e98361c68da85',
+    },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: true,
     },
   },
   {
@@ -24,6 +29,9 @@ const externalResourceSchema = new mongoose.Schema(
   }
 );
 
-const externalResource = mongoose.model('External Resource', externalResourceSchema);
+const externalResource = mongoose.model(
+  'External Resource',
+  externalResourceSchema
+);
 
-module.exports = externalResource ;
+module.exports = externalResource;

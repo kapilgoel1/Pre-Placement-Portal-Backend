@@ -10,6 +10,7 @@ const mongoose = require('./db/mongoose');
 const userRouter = require('./routers/user');
 const announcementRouter = require('./routers/announcement');
 const subjectRouter = require('./routers/subject');
+const courseRouter = require('./routers/course');
 const fileRouter = require('./routers/file');
 const testRouter = require('./routers/test');
 const externalResourceRouter = require('./routers/externalresource');
@@ -74,6 +75,7 @@ Subject.findOne({ _id: '5f9887f1a71e98361c68da85' }, async (err, doc) => {
 app.use('/user', userRouter);
 app.use('/announcement', announcementRouter);
 app.use('/subject', subjectRouter);
+app.use('/course', courseRouter);
 app.use('/file', fileRouter);
 app.use('/test', testRouter);
 app.use('/externalresource', externalResourceRouter);
