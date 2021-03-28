@@ -15,6 +15,7 @@ const fileRouter = require('./routers/file');
 const testRouter = require('./routers/test');
 const externalResourceRouter = require('./routers/externalresource');
 const jobPostingRouter = require('./routers/jobposting');
+const internshipRouter = require('./routers/internship');
 const manageUsersRouter = require('./routers/manageusers');
 const resumeRouter = require('./routers/resume');
 
@@ -80,6 +81,7 @@ app.use('/file', fileRouter);
 app.use('/test', testRouter);
 app.use('/externalresource', externalResourceRouter);
 app.use('/jobposting', jobPostingRouter);
+app.use('/internship', internshipRouter);
 app.use('/manageusers', manageUsersRouter);
 app.use('/resume', resumeRouter);
 

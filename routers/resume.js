@@ -229,7 +229,7 @@ router.get('/my/view', isAuthenticated, async (req, res) => {
 
 router.get('/view/student', isAuthenticated, async (req, res) => {
   const { userid, name } = req.query;
-
+  if (!name) name = 'resume';
   const params = {
     Bucket: process.env.BUCKET_NAME,
     Key: `resume/${userid}.pdf`,
