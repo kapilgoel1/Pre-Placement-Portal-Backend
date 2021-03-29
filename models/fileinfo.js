@@ -1,5 +1,24 @@
 const mongoose = require('mongoose');
 
+const submittedAssignmentsSchema = new mongoose.Schema({
+  filename: {
+    type: String,
+    default: '',
+  },
+  email: {
+    type: String,
+    default: '',
+  },
+  firstname: {
+    type: String,
+    default: '',
+  },
+  lastname: {
+    type: String,
+    default: '',
+  },
+});
+
 const fileInfoSchema = new mongoose.Schema(
   {
     uuid: {
@@ -23,12 +42,12 @@ const fileInfoSchema = new mongoose.Schema(
     course: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Course',
-      required: true,
     },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
+    submittedassignments: [submittedAssignmentsSchema],
   },
   {
     timestamps: true,

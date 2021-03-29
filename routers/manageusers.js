@@ -3,6 +3,7 @@ const multer = require('multer');
 const XLSX = require('xlsx');
 const path = require('path');
 const bcrypt = require('bcryptjs');
+const _ = require('lodash');
 const User = require('../models/user');
 const { isAuthenticated, isAdmin } = require('../middleware/checkauthlevel');
 const router = new express.Router();
@@ -100,8 +101,9 @@ router.post(
       sheet.map(async (user) => {
         let pass;
         let obj = {};
-        if (user.First_Name) obj.firstname = user.First_Name;
-        if (user.Last_Name) obj.lastname = user.Last_Name;
+        if (user.First_Name) obj.firstname = _.upperFirst(user.First_Name);
+        if (user.Last_Name) obj.lastname = _.upperFirst(user.Last_Name);
+        if (user.Mobile_No) obj.phone = user.Mobile_No.toString();
         try {
           pass = await bcrypt.hash(user.Password.toString(), 10);
           User.findOneAndUpdate(

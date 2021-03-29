@@ -19,6 +19,7 @@ const uploadS3 = multer({
       cb(null, 'announcement/' + file.uniqueid);
     },
   }),
+  limits: { fileSize: 20971520 },
 });
 
 router.post(
@@ -32,9 +33,9 @@ router.post(
     const announcement = new Announcement({
       title: req.query.title,
       content: req.query.content,
-      course: req.query.course,
       publisher: req.user._id,
       filename: filename,
+      course: req.query.course,
     });
     try {
       await announcement.save();

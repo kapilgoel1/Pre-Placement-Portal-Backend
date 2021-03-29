@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/user');
 const Subject = require('./models/subject');
 const cors = require('cors');
+const helmet = require('helmet');
 const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
@@ -20,6 +21,7 @@ const manageUsersRouter = require('./routers/manageusers');
 const resumeRouter = require('./routers/resume');
 
 const app = express();
+app.use(helmet());
 const port = process.env.PORT;
 
 app.use(express.json());

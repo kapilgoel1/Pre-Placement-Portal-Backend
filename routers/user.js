@@ -60,7 +60,10 @@ router.post('/registerwithoutlogin', isAuthenticated, isAdmin, (req, res) => {
       if (!doc) {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         req.body.password = hashedPassword;
-
+        if (req.body.firstname)
+          req.body.firstname = _.upperFirst(req.body.firstname);
+        if (req.body.lastname)
+          req.body.lastname = _.upperFirst(req.body.lastname);
         newUser = new User({
           ...req.body,
         });
