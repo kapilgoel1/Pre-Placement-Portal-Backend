@@ -46,7 +46,7 @@ router.get('/retrievelist', isAuthenticated, async (req, res) => {
         const fileObj = file.toObject();
         return {
           ...fileObj,
-          submittedassignments: [],
+          submittedassignments: fileObj.submittedassignments.length,
         };
       });
       res
