@@ -171,7 +171,7 @@ router.delete('/remove/:uuid', isAuthenticated, async (req, res) => {
 const uploadassignmentS3 = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'portal1919',
+    bucket: process.env.BUCKET_NAME,
     metadata: (req, file, cb) => {
       cb(null, { fieldName: file.fieldname });
     },

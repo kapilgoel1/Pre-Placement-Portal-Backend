@@ -159,7 +159,7 @@ router.post('/generate', isAuthenticated, async (req, res) => {
     var params = {
       Key: `resume/${req.user._id}.pdf`,
       Body: doc,
-      Bucket: 'portal1919',
+      Bucket: process.env.BUCKET_NAME,
       ContentType: 'application/pdf',
     };
     doc.end();
