@@ -1,6 +1,7 @@
 const express = require('express');
 const s3 = require('../cloudstorage/aws');
 const Resume = require('../models/resume');
+const User = require('../models/user');
 const PDFDocument = require('pdfkit');
 const _ = require('lodash');
 const router = new express.Router();
@@ -158,17 +159,18 @@ router.post('/generate', isAuthenticated, async (req, res) => {
     var params = {
       Key: `resume/${req.user._id}.pdf`,
       Body: doc,
-      Bucket: 'portal1919',
+      Bucket: process.env.BUCKET_NAME,
       ContentType: 'application/pdf',
     };
     doc.end();
 
     // Uploading files to the bucket
-    s3.upload(params, function (err, data) {
+    s3.upload(params, async function (err, data) {
       if (err) {
         throw err;
       }
       console.log(`File uploaded successfully. ${data.Location}`);
+      await User.updateOne({ _id: req.user._id }, { hasresume: true });
       res.status(200).send({});
     });
   } catch (e) {
@@ -221,6 +223,24 @@ router.get('/my/view', isAuthenticated, async (req, res) => {
       res.send(data.Body);
     } else {
       res.status(500).send(err);
+    }
+  });
+});
+
+router.get('/view/student', isAuthenticated, async (req, res) => {
+  const { userid, name } = req.query;
+  if (!name) name = 'resume';
+  const params = {
+    Bucket: process.env.BUCKET_NAME,
+    Key: `resume/${userid}.pdf`,
+  };
+  s3.getObject(params, function (err, data) {
+    if (err === null) {
+      res.setHeader('content-type', 'application/pdf');
+      res.setHeader('Content-disposition', 'inline; filename=' + name + '.pdf');
+      res.send(data.Body);
+    } else {
+      res.status(500).send({ error: 'resume not found' });
     }
   });
 });

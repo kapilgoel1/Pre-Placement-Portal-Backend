@@ -6,7 +6,7 @@ const testSchema = new mongoose.Schema(
       type: String,
     },
     detail: {
-      type: String
+      type: String,
     },
     link: {
       type: String,
@@ -18,7 +18,12 @@ const testSchema = new mongoose.Schema(
     subject: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Subject',
-      default: '5f9887f1a71e98361c68da85'
+      default: '5f9887f1a71e98361c68da85',
+    },
+    course: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Course',
+      required: true,
     },
   },
   {

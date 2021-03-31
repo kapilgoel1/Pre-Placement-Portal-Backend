@@ -8,9 +8,10 @@ const subjectSchema = new mongoose.Schema({
   semester: {
     type: Number,
   },
-  programme: {
-    type: String,
-    default: 'MCA',
+  course: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+    required: true,
   },
 });
 

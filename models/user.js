@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
         }
       },
     },
+    rollno: {
+      type: String,
+      default: '',
+    },
     password: {
       type: String,
       required: true,
@@ -29,12 +33,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "student",
+      default: 'student',
     },
-    // admin: {
-    //   type: Boolean,
-    //   default: false,
-    // },
     phone: {
       type: String,
       default: "",
@@ -66,6 +66,14 @@ const userSchema = new mongoose.Schema(
     dob: {
       type: String,
       default: "",
+    },
+    hasresume: {
+      type: Boolean,
+      default: false,
+    },
+    accountactivated: {
+      type: Boolean,
+      default: false,
     },
   },
   {
