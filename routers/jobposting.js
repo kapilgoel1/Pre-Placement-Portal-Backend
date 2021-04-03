@@ -53,6 +53,32 @@ router.get('/retrieve', isAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/retrieveoptimised', isAuthenticated, async (req, res) => {
+  try {
+    const { skip, limit, ...filterOptions } = req.query;
+    var postings = JobPosting.find({ ...filterOptions }).sort({
+      createdAt: 'desc',
+    });
+
+    Promise.all([postings]).then((response) => {
+      const modifiedPostings = response[0].map((posting) => {
+        posting = posting.toObject();
+        let appliedbyuser = false;
+        if (posting.applicants.includes(req.user._id)) appliedbyuser = true;
+        return {
+          ...posting,
+          applicants: posting.applicants.length,
+          appliedbyuser,
+        };
+      });
+      res.status(200).send({ postings: modifiedPostings });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
 router.get('/details/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;

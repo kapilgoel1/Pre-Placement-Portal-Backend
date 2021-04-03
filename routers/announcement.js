@@ -88,6 +88,45 @@ router.get('/retrieve', isAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/retrieveoptimised', isAuthenticated, async (req, res) => {
+  try {
+    const { skip, limit, ...filterOptions } = req.query;
+    var announcementList = Announcement.find({ ...filterOptions })
+      .sort({ createdAt: 'desc' })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    Promise.all([announcementList]).then((response) => {
+      res.status(200).send({
+        announcementList: response[0],
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
+router.get('/retrievedashboard', isAuthenticated, async (req, res) => {
+  try {
+    const { skip, limit, ...filterOptions } = req.query;
+    var announcementList = Announcement.find({ ...filterOptions })
+      .select('_id title')
+      .sort({ createdAt: 'desc' })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    Promise.all([announcementList]).then((response) => {
+      res.status(200).send({
+        announcementList: response[0],
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
 router.get('/details/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;
@@ -95,6 +134,17 @@ router.get('/details/:id', isAuthenticated, async (req, res) => {
       path: 'publisher',
       select: 'firstname lastname',
     });
+    if (announcement !== null) res.status(200).json(announcement);
+    else res.status(400).json('Not found');
+  } catch (e) {
+    res.status(400).json('Not Found');
+  }
+});
+
+router.get('/detailsoptimised/:id', isAuthenticated, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const announcement = await Announcement.findById(id);
     if (announcement !== null) res.status(200).json(announcement);
     else res.status(400).json('Not found');
   } catch (e) {

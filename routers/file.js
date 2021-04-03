@@ -144,6 +144,28 @@ router.get('/download/:fileid', isAuthenticated, async (req, res) => {
   });
 });
 
+router.get(
+  '/downloadoptimised/:uuid/:filename',
+  isAuthenticated,
+  async (req, res) => {
+    var filename = req.params.filename;
+    var uuid = req.params.uuid;
+
+    const params = {
+      Bucket: process.env.BUCKET_NAME,
+      Key: 'files/' + uuid,
+    };
+    s3.getObject(params, function (err, data) {
+      if (err === null) {
+        res.attachment(filename);
+        res.send(data.Body);
+      } else {
+        res.status(500).send(err);
+      }
+    });
+  }
+);
+
 router.delete('/remove/:uuid', isAuthenticated, async (req, res) => {
   var uuid = req.params.uuid;
   try {
