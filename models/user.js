@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const validator = require('validator');
+const mongoose = require("mongoose");
+const validator = require("validator");
 
 const userSchema = new mongoose.Schema(
   {
@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate(value) {
         if (!validator.isEmail(value)) {
-          throw new Error('Email is invalid');
+          throw new Error("Email is invalid");
         }
       },
     },
@@ -25,11 +25,11 @@ const userSchema = new mongoose.Schema(
     },
     firstname: {
       type: String,
-      default: '',
+      default: "",
     },
     lastname: {
       type: String,
-      default: '',
+      default: "",
     },
     role: {
       type: String,
@@ -37,15 +37,15 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      default: '',
+      default: "",
     },
     course: {
       type: String,
-      default: 'MCA',
+      default: "MCA",
     },
     semester: {
       type: String,
-      default: '',
+      default: "",
     },
     passwordupdated: {
       type: Boolean,
@@ -53,19 +53,19 @@ const userSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      default: '',
+      default: "",
     },
     fathersname: {
       type: String,
-      default: '',
+      default: "",
     },
     mothersname: {
       type: String,
-      default: '',
+      default: "",
     },
     dob: {
       type: String,
-      default: '',
+      default: "",
     },
     hasresume: {
       type: Boolean,
@@ -81,6 +81,6 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model("User", userSchema);
 
 module.exports = User;
