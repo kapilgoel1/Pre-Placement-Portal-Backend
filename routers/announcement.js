@@ -36,6 +36,7 @@ router.post(
       publisher: req.user._id,
       filename: filename,
       course: req.query.course,
+      link: req.query.link,
     });
     try {
       await announcement.save();

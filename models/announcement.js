@@ -23,6 +23,10 @@ const announcementSchema = new mongoose.Schema(
       ref: 'Course',
       required: true,
     },
+    link: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

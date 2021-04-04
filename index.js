@@ -30,15 +30,27 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(
-  session({
-    secret: 'secretcode',
+
+let sessionProperties;
+if ((process.env.COOKIE_SECURE = 'secure'))
+  sessionProperies = {
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge: 43200000, secure: true, sameSite: 'none' },
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+    proxy: true,
+  };
+if ((process.env.COOKIE_SECURE = 'notsecure'))
+  sessionProperties = {
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
     cookie: { maxAge: 43200000 },
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-  })
-);
+  };
+app.use(session(sessionProperties));
+
 app.use(passport.initialize());
 app.use(passport.session());
 require('./middleware/passport')(passport);
