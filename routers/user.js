@@ -13,7 +13,7 @@ router.post('/login', (req, res, next) => {
     else {
       req.logIn(user, (err) => {
         if (err) throw err;
-        res.json(user);
+        res.json({ ...user.toObject(), password: '' });
       });
     }
   })(req, res, next);
@@ -103,7 +103,10 @@ router.post('/signup', isAuthenticated, isAdmin, (req, res) => {
 });
 
 router.get('/details', isAuthenticated, (req, res) => {
-  res.send(req.user); // The req.user stores the entire user that has been authenticated inside of it.
+  res.send({
+    ...req.user.toObject(),
+    password: '',
+  }); // The req.user stores the entire user that has been authenticated inside of it.
 });
 
 router.get('/logout', isAuthenticated, (req, res) => {

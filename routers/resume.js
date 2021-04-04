@@ -48,28 +48,35 @@ router.post('/generate', isAuthenticated, async (req, res) => {
       .font('Times-Roman')
       .moveDown(0.3)
       .text(resume.careerObjective, 82);
+    if (resume.skills) {
+      doc.fontSize(19).font('Times-Bold').moveDown().text('Skills', 72);
+      doc
+        .fontSize(15)
+        .font('Times-Roman')
+        .moveDown(0.3)
+        .list(resume.skills, 82);
+    }
 
-    doc.fontSize(19).font('Times-Bold').moveDown().text('Skills', 72);
-    doc.fontSize(15).font('Times-Roman').moveDown(0.3).list(resume.skills, 82);
-
-    doc.fontSize(19).font('Times-Bold').moveDown().text('Education', 72);
-    doc.fontSize(15).font('Times-Roman').moveDown(0.5);
-    resume.education.map((ed) => {
-      doc.moveDown(0.5);
-      doc.x = 82;
-      y = doc.y;
-      doc.text(ed.fromYear + ' - ' + ed.toYear);
-      var h = doc.heightOfString(ed.qualification, {
-        width: 100,
+    if (resume.education) {
+      doc.fontSize(19).font('Times-Bold').moveDown().text('Education', 72);
+      doc.fontSize(15).font('Times-Roman').moveDown(0.5);
+      resume.education.map((ed) => {
+        doc.moveDown(0.5);
+        doc.x = 82;
+        y = doc.y;
+        doc.text(ed.fromYear + ' - ' + ed.toYear);
+        var h = doc.heightOfString(ed.qualification, {
+          width: 100,
+        });
+        doc.text(ed.qualification, doc.x + 150, y, {
+          width: 100,
+        });
+        doc.text(ed.institute, doc.x + 150, y, {
+          width: 100,
+        });
+        if (h > 20) doc.moveDown();
       });
-      doc.text(ed.qualification, doc.x + 150, y, {
-        width: 100,
-      });
-      doc.text(ed.institute, doc.x + 150, y, {
-        width: 100,
-      });
-      if (h > 20) doc.moveDown();
-    });
+    }
     doc.x = 72;
     if (resume.workExperience) {
       doc.fontSize(19).moveDown().font('Times-Bold').text('Work Experience');
@@ -98,38 +105,41 @@ router.post('/generate', isAuthenticated, async (req, res) => {
         doc.moveDown(0.5);
       });
     }
-    doc.fontSize(19).font('Times-Bold').moveDown().text('Achievements', 72);
-    doc
-      .fontSize(15)
-      .font('Times-Roman')
-      .moveDown(0.3)
-      .list(resume.achievements, 82);
-
-    doc
-      .fontSize(19)
-      .font('Times-Bold')
-      .moveDown()
-      .text('Projects Undertaken', 72);
-    resume.projects.map((project, i) => {
+    if (resume.achievements) {
+      doc.fontSize(19).font('Times-Bold').moveDown().text('Achievements', 72);
       doc
-        .fontSize(16)
+        .fontSize(15)
+        .font('Times-Roman')
+        .moveDown(0.3)
+        .list(resume.achievements, 82);
+    }
+    if (resume.projects) {
+      doc
+        .fontSize(19)
         .font('Times-Bold')
         .moveDown()
-        .text(`${i + 1}. ${project.title}`, 82);
-      doc
-        .fontSize(15)
-        .moveDown(0.3)
-        .text('Technologies Used: ', 92, doc.y, { continued: true })
-        .font('Times-Roman')
-        .text(project.technologiesUsed);
-      doc
-        .fontSize(15)
-        .moveDown(0.3)
-        .font('Times-Bold')
-        .text('Project Description: ', { continued: true })
-        .font('Times-Roman')
-        .text(project.description);
-    });
+        .text('Projects Undertaken', 72);
+      resume.projects.map((project, i) => {
+        doc
+          .fontSize(16)
+          .font('Times-Bold')
+          .moveDown()
+          .text(`${i + 1}. ${project.title}`, 82);
+        doc
+          .fontSize(15)
+          .moveDown(0.3)
+          .text('Technologies Used: ', 92, doc.y, { continued: true })
+          .font('Times-Roman')
+          .text(project.technologiesUsed);
+        doc
+          .fontSize(15)
+          .moveDown(0.3)
+          .font('Times-Bold')
+          .text('Project Description: ', { continued: true })
+          .font('Times-Roman')
+          .text(project.description);
+      });
+    }
 
     doc.x = 72;
 

@@ -53,6 +53,32 @@ router.get('/retrieve', isAuthenticated, async (req, res) => {
   }
 });
 
+router.get('/retrieveoptimised', isAuthenticated, async (req, res) => {
+  try {
+    const { skip, limit, ...filterOptions } = req.query;
+    var internships = Internship.find({ ...filterOptions }).sort({
+      createdAt: 'desc',
+    });
+
+    Promise.all([internships]).then((response) => {
+      const modifiedInternships = response[0].map((internship) => {
+        internship = internship.toObject();
+        let appliedbyuser = false;
+        if (internship.applicants.includes(req.user._id)) appliedbyuser = true;
+        return {
+          ...internship,
+          applicants: internship.applicants.length,
+          appliedbyuser,
+        };
+      });
+      res.status(200).send({ postings: modifiedInternships });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
 router.get('/details/:id', isAuthenticated, async (req, res) => {
   try {
     const id = req.params.id;

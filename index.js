@@ -30,15 +30,27 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(
-  session({
-    secret: 'secretcode',
+
+let sessionProperties;
+if ((process.env.COOKIE_SECURE = 'secure'))
+  sessionProperies = {
+    secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
-    cookie: { maxAge: 10800000 },
+    cookie: { maxAge: 43200000, secure: true, sameSite: 'none' },
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
-  })
-);
+    proxy: true,
+  };
+if ((process.env.COOKIE_SECURE = 'notsecure'))
+  sessionProperties = {
+    secret: process.env.SESSION_SECRET,
+    resave: true,
+    saveUninitialized: true,
+    cookie: { maxAge: 43200000 },
+    store: new MongoStore({ mongooseConnection: mongoose.connection }),
+  };
+app.use(session(sessionProperties));
+
 app.use(passport.initialize());
 app.use(passport.session());
 require('./middleware/passport')(passport);
@@ -58,20 +70,6 @@ User.findOne({ email: process.env.ADMIN_ID }, async (err, doc) => {
     });
     await newUser.save();
     console.log('admin user created');
-  }
-});
-
-Subject.findOne({ _id: '5f9887f1a71e98361c68da85' }, async (err, doc) => {
-  if (err) throw err;
-  if (doc) {
-  }
-  if (!doc) {
-    newSubject = new Subject({
-      _id: '5f9887f1a71e98361c68da85',
-      title: 'General',
-    });
-    await newSubject.save();
-    console.log('subject created');
   }
 });
 
