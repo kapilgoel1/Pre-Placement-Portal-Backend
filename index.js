@@ -32,7 +32,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 let sessionProperties;
-if ((process.env.COOKIE_SECURE = 'secure'))
+if (process.env.COOKIE_SECURE == 'secure')
   sessionProperties = {
     secret: process.env.SESSION_SECRET,
     resave: true,
@@ -41,7 +41,7 @@ if ((process.env.COOKIE_SECURE = 'secure'))
     store: new MongoStore({ mongooseConnection: mongoose.connection }),
     proxy: true,
   };
-if ((process.env.COOKIE_SECURE = 'notsecure'))
+if (process.env.COOKIE_SECURE == 'notsecure')
   sessionProperties = {
     secret: process.env.SESSION_SECRET,
     resave: true,
