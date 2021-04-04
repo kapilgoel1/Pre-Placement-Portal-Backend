@@ -33,7 +33,7 @@ app.use(cors(corsOptions));
 
 let sessionProperties;
 if ((process.env.COOKIE_SECURE = 'secure'))
-  sessionProperies = {
+  sessionProperties = {
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true,
