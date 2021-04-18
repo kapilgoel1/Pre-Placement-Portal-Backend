@@ -1,5 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const compression = require('compression');
 const User = require('./models/user');
 const Subject = require('./models/subject');
 const cors = require('cors');
@@ -22,6 +23,7 @@ const resumeRouter = require('./routers/resume');
 
 const app = express();
 app.use(helmet());
+app.use(compression());
 const port = process.env.PORT;
 
 app.use(express.json());
