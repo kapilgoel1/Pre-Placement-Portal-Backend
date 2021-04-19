@@ -3,6 +3,7 @@ const User = require('../models/user');
 const passport = require('passport');
 const { isAuthenticated, isAdmin } = require('../middleware/checkauthlevel');
 const bcrypt = require('bcryptjs');
+const _ = require('lodash');
 const router = new express.Router();
 
 // Routes
