@@ -9,10 +9,10 @@
 
 ### Technologies Used -
 
-Database : MongoDB
-Frontend: React
-Backend: Nodejs, Express
-File Storage: AWS S3
+Database : MongoDB.
+Frontend: React.
+Backend: Nodejs, Express.
+File Storage: AWS S3.
 
 
 ### Developed By
